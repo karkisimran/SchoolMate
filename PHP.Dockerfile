@@ -1,5 +1,10 @@
-FROM php:8.1-fpm
+FROM php:8.2-fpm-alpine
 
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+RUN apk add --no-cache \
+    php-mysqli \
+    php-pdo_mysql \
+    php-session \
+    && docker-php-ext-install pdo pdo_mysql
 
-WORKDIR /var/www/html
+# Optional: Install Composer
+COPY --from=composer /usr/bin/composer /usr/bin/composer
