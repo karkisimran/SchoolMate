@@ -1,0 +1,156 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* ===== Body background fixed ===== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    width: 100%;
+    background: url("images/school.jpg") no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed;
+    position: relative;
+}
+
+/* Overlay to fade background slightly */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(243, 249, 251, 0.827); /* subtle fade */
+    z-index: 0;
+}
+
+/* ===== Logo + Brand fixed top-left ===== */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: fixed;  /* stays on top-left */
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+}
+
+.header img.logo {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.header .brand {
+    font-size: 30px;
+    font-weight: bold;
+    color: #2E2B5F;
+}
+
+/* ===== Centered Form ===== */
+.form-container {
+    position: fixed;      /* center fixed */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40%;
+    max-width: 800px;
+    padding: 30px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 12px;
+    text-align: left;
+    z-index: 5;
+}
+
+/* ===== Form Titles ===== */
+.form-container h2 {
+    text-align: center;
+    font-size: 38px;
+    color: #2E2B5F;
+    margin-bottom: 6px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 16px;
+    color: #444;
+    margin-bottom: 25px;
+}
+
+/* ===== Labels ===== */
+label {
+    font-size: 16px;
+    margin-bottom: 8px;
+    display: block;
+    font-weight: 600;
+    color: #2E2B5F;
+}
+
+/* ===== Inputs and Selects ===== */
+input, select {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 22px;
+    border: 1px solid #060606;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fff;
+    color: #333;
+}
+
+input::placeholder, select option {
+    color: #999;
+}
+
+input:focus, select:focus {
+    border-color: #2E2B5F;
+    outline: none;
+}
+
+/* ===== Button ===== */
+.btn {
+    width: 100%;
+    background-color: #2E2B5F;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background-color: #241f50;
+}
+
+
+/* icons */
+.input-group {
+    position: relative;
+    width: 100%;
+}
+
+.input-group input {
+    width: 100%;
+    padding-right: 40px; /* space for the icon */
+    box-sizing: border-box;
+}
+
+.input-group .toggle-icon {
+    position: absolute;
+    right: 10px;
+    top: 40%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 24px;  /* adjust size of your PNG */
+    height: 24px;
+}
