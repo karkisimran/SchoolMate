@@ -1,35 +1,60 @@
 <?php
 session_start();
-require 'database.php'; // your mysqli connection file
+include 'database.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $confirm = $_POST['confirm_password'] ?? '';
+// Initialize error and success messages
+$_SESSION['error'] = '';
+$_SESSION['success'] = '';
 
-    if ($password !== $confirm) {
-        $_SESSION['error'] = "Passwords do not match!";
+// Get form data
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $confirm_password = trim($_POST['confirm_password'] ?? '');
+
+    // Basic validation
+    if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
+        $_SESSION['error'] = "All fields are required.";
+    } elseif ($password !== $confirm_password) {
+        $_SESSION['error'] = "Passwords do not match.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error'] = "Invalid email format.";
+    } elseif (strlen($password) < 6) {
+        $_SESSION['error'] = "Password must be at least 6 characters long.";
     } else {
         // Hash the password
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // Insert into DB
-        $stmt = $conn->prepare("INSERT INTO users (email, password) VALUES (?, ?)");
-        $stmt->bind_param("ss", $email, $hashedPassword);
+        // Insert into database
+        $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($sql);
 
-        if ($stmt->execute()) {
-            $_SESSION['success'] = "Successfully registered!";
-            header("refresh:2; url=login.php");
-            exit;
+        if ($stmt) {
+            $stmt->bind_param("sss", $name, $email, $hashed_password);
+            
+            if ($stmt->execute()) {
+                // Registration successful
+                $_SESSION['success'] = "Registration successful! You can now login.";
+                header("Location: login.php");
+                exit();
+            } else {
+                // Error in execution
+                $_SESSION['error'] = "Error: " . $stmt->error;
+            }
         } else {
-            $_SESSION['error'] = "Error: " . $stmt->error;
+            // Error in preparing statement
+            $_SESSION['error'] = "Error: " . $conn->error;
         }
+    }
+
+    if ($_SESSION['error']) {
+        header("Location: register.php");
+        exit();
     }
 }
 ?>
 
-
-<!-- HTML & CSS -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #222;
         }
 
+        input[type="text"],
         input[type="email"],
         input[type="password"] {
             width: 100%;
@@ -163,7 +189,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 20px;
         }
 
-
         .social-icon img {
             width: 32px;  
             height: 32px; 
@@ -191,12 +216,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .signup-text a:hover {
             text-decoration: underline;
         }
-    </style>
 
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body>
-
 <div class="container">
     <div class="left-image">
         <img src="images/school.jpg" alt="School Building" />
@@ -210,14 +243,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <h1 class="login-title">Register</h1>
 
-        <?php if(isset($_SESSION['error'])): ?>
-            <div style="color:red;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+        <?php if (isset($_SESSION['error']) && !empty($_SESSION['error'])): ?>
+            <div class="error"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
         <?php endif; ?>
-        <?php if(isset($_SESSION['success'])): ?>
-            <div style="color:green;"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+        <?php if (isset($_SESSION['success']) && !empty($_SESSION['success'])): ?>
+            <div class="success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
         <?php endif; ?>
 
         <form action="register.php" method="POST">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter Your Name" required />
+
             <label for="email">Email</label>
             <input type="email" id="email" name="email" placeholder="Enter Your Email" required />
 
@@ -246,6 +282,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </p>
     </div>
 </div>
-
 </body>
 </html>
